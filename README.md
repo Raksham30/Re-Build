@@ -44,22 +44,7 @@ are live tests that need a real `GEMINI_API_KEY`.)
   section with feedback → export markdown with a verified, renumbered reference list. Options: document type,
   organisation, length, tone, your own research, free-text instructions.
 
-## Not included yet
-- Upload processing runs inside the request (a large PDF holds the connection for the parse + embed + extract time);
-  a Redis-backed job queue is the next step for multi-user scale.
-- No cross-encoder reranker; keyword ranking is Postgres `ts_rank_cd` (BM25-like, not literal BM25).
-- No OCR for scanned PDFs (they are rejected with a clear message).
-- Review drafts are held in the browser (download the markdown); they are not saved server-side.
 
-## Notes
-
-- **Embedding dimension** (`GEMINI_EMBEDDING_DIM`, default 1536) is fixed when the `chunks`
-  table is created. Changing it needs `DROP TABLE chunks` and re-uploading papers; a mismatch
-  raises a clear error at startup.
-- **Auth dev mode:** without `FIREBASE_SERVICE_ACCOUNT_PATH`, any bearer token is treated as the
-  user id. Never expose that publicly.
-- See `docs/ARCHITECTURE.md` for the pipeline and design decisions, and `backend/eval/` to benchmark retrieval.
-- `APP_ENV=production` refuses to start with dev-mode auth or wildcard CORS.
 
 ## Layout
 
