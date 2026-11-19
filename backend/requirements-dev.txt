@@ -1,0 +1,5 @@
+-r requirements.txt
+pytest>=8
+moto[s3]>=5           # mocked S3 for file_storage tests
+pgserver>=0.1.4       # optional: embedded Postgres+pgvector for tests without Docker
+fakeredis>=2.23     # in-memory Redis for cache tests

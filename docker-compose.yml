@@ -1,0 +1,45 @@
+# Local stack: API + Postgres(pgvector) + Redis.
+#   cp backend/.env.example backend/.env   (set GEMINI_API_KEY)
+#   docker compose up --build
+#
+# PDFs are stored on a Docker volume (local-disk mode). MinIO was removed from this file because its
+# Docker Hub / Quay images are no longer pullable. To use real S3-compatible storage (AWS S3, Cloudflare R2,
+# Garage, ...) set S3_ENDPOINT_URL, S3_BUCKET, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY in backend/.env
+# and delete the four S3_* lines under `api.environment`.
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: research
+    ports: ["5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d research"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:            # answer + prompt cache (optional: the API runs without it)
+    image: redis:7-alpine          # no host port: only the API container needs it (avoids clashes with other Redis)
+
+  api:
+    build: ./backend
+    env_file: ./backend/.env
+    environment:          # container-network overrides of .env
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/research
+      REDIS_URL: redis://redis:6379/0
+      S3_ENDPOINT_URL: ""
+      S3_BUCKET: ""
+      S3_ACCESS_KEY_ID: ""
+      S3_SECRET_ACCESS_KEY: ""
+    ports: ["8010:8010"]
+    volumes:
+      - uploads:/app/data       # uploaded PDFs survive restarts
+    depends_on:
+      db: {condition: service_healthy}
+      redis: {condition: service_started}
+
+volumes:
+  pgdata:
+  uploads:

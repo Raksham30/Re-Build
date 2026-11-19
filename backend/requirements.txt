@@ -1,0 +1,23 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic-settings==2.5.2
+eval_type_backport>=0.2.0
+python-multipart==0.0.12
+psutil>=5.9            # memory instrumentation in the upload endpoint
+firebase-admin==6.5.0
+
+# Postgres + pgvector (metadata, chunks, vectors, full-text)
+psycopg[binary,pool]>=3.2
+
+# PDF parsing (local, layout-aware)
+pymupdf>=1.24
+
+# Redis cache
+redis>=5.0
+numpy>=1.26
+
+# S3-compatible object storage (Cloudflare R2 / AWS S3 / MinIO)
+boto3>=1.34
+
+# LLM + embeddings
+google-genai>=0.1.0
